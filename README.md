@@ -98,7 +98,10 @@ model.compile(loss='binary_crossentropy',
 
 ## Training and Evaluating the Model
 
-Remember that training deep networks is resource intensive: even a CNN with 3-4 successive convolutional and pooling layers is apt to take a few hours to train on a high end laptop. As such, you may want to set your model to run the training epochs overnight.  
+Remember that training deep networks is resource intensive: depending on the size of the data, even a CNN with 3-4 successive convolutional and pooling layers is apt to take a hours to train on a high end laptop. Using 30 epochs and 8 layers (alternating between convolutional and pooling), our model took about 40 minutes to run on a year old macbook pro.
+
+
+If you are concerned with runtime, you may want to set your model to run the training epochs overnight.  
 
 **If you are going to run this process overnight, be sure to also script code for the following questions concerning data augmentation. Check your code twice (or more) and then set the notebook to run all, or something equivalent to have them train overnight.**
 
@@ -223,7 +226,9 @@ model.save('chest_xray_downsampled_data.h5')
 
 ## Data Augmentation
 
-Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. As such, if you haven't already, implement a data augmentation setup. Also script the 
+Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. As such, if you haven't already, implement a data augmentation setup.
+
+**Warning: This process took nearly 4 hours to run on a relatively new macbook pro. As such, it is recommended that you simply code the setup and compare to the solution branch, or set the process to run overnight if you do choose to actually run the code.**
 
 
 ```python
