@@ -66,6 +66,12 @@ validation_generator = test_datagen.flow_from_directory(
 Now it's time to design your CNN! Remember a few things when doing this: 
 
 
+* You should alternate convolutional and pooling layers
+* You should have later layers have a larger number of parameters in order to detect more abstract patterns
+* Add some final dense layers to add a classifier to the convolutional base
+
+
+
 ```python
 from keras import layers
 from keras import models
