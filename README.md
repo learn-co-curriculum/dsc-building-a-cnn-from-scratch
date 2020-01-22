@@ -3,19 +3,22 @@
 
 ## Introduction
 
-Now that you have background knowledge regarding how CNNs work and how to implement them via Keras, its time to practice those skills a little more independently in order to build a CNN on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
+Now that you have background knowledge regarding how CNNs work and how to build them using Keras, its time to practice those skills a little more independently in order to build a CNN on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
 
 ## Objectives
 
-You will be able to:
-* Transform images into tensors
-* Build a CNN model for image recognition
+In this lab you will: 
+
+- Load images from a hierarchical file structure using an image datagenerator 
+- Apply data augmentation to image files before training a neural network 
+- Build a CNN using Keras 
+- Visualize and evaluate the performance of CNN models 
 
 ## Loading the Images
 
-The data for this lab concerns classifying lung xray images for pneumonia. The original dataset is from kaggle. We have downsampled this dataset in order to reduce training time for you when you design and fit your model to the data. ⏰ It is anticipated that this process will take approximately 1 hour to run on a standard machine, although times will vary depending on your particular computer and set up. At the end of this lab, you are welcome to try training on the complete dataset and observe the impact on the model's overall accuracy. 
+The data for this lab concerns lung xray images for pneumonia. The original dataset is from Kaggle. We have downsampled this dataset in order to reduce training time for you when you design and fit your model to the data. ⏰ It is anticipated that this process will take approximately one hour to run on a standard machine, although times will vary depending on your particular computer and set up. At the end of this lab, you are welcome to try training on the complete dataset and observe the impact on the model's overall accuracy. 
 
-You can find the initial downsampled dataset in a subdirectory, **chest_xray**, of this repository.
+You can find the initial downsampled dataset in a subdirectory, **chest_xray**, of this repository. 
 
 
 ```python
@@ -50,11 +53,10 @@ train_generator = train_datagen.flow_from_directory(
         # Since we use binary_crossentropy loss, we need binary labels
         class_mode='binary')
 
-validation_generator = test_datagen.flow_from_directory(
-        validation_dir,
-        target_size=(150, 150),
-        batch_size=20,
-        class_mode='binary')
+validation_generator = test_datagen.flow_from_directory(validation_dir,
+                                                        target_size=(150, 150),
+                                                        batch_size=20,
+                                                        class_mode='binary')
 ```
 
     Found 1738 images belonging to 2 classes.
@@ -63,10 +65,12 @@ validation_generator = test_datagen.flow_from_directory(
 
 ## Designing the Model
 
-Now it's time to design your CNN! Remember a few things when doing this: 
-* You should alternate convolutional and pooling layers
-* You should have later layers have a larger number of parameters in order to detect more abstract patterns
-* Add some final dense layers to add a classifier to the convolutional base
+Now it's time to design your CNN using Keras! Remember a few things when doing this: 
+
+- You should alternate convolutional and pooling layers
+- You should have later layers have a larger number of parameters in order to detect more abstract patterns
+- Add some final dense layers to add a classifier to the convolutional base 
+- Compile this model 
 
 
 ```python
@@ -86,8 +90,6 @@ model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Flatten())
 model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid'))
-
-
 ```
 
 
@@ -106,16 +108,16 @@ Remember that training deep networks is resource intensive: depending on the siz
 
 If you are concerned with runtime, you may want to set your model to run the training epochs overnight.  
 
-**If you are going to run this process overnight, be sure to also script code for the following questions concerning data augmentation. Check your code twice (or more) and then set the notebook to run all, or something equivalent to have them train overnight.**
+**If you are going to run this process overnight, be sure to also script code for the following questions concerning data augmentation. Check your code twice (or more) and then set the notebook to run all, or something equivalent to have them train overnight.** 
 
 
 ```python
-history = model.fit_generator(
-      train_generator,
-      steps_per_epoch=100,
-      epochs=30,
-      validation_data=validation_generator,
-      validation_steps=50)
+# ⏰ This cell may take several minutes to run
+history = model.fit_generator(train_generator, 
+                              steps_per_epoch=100, 
+                              epochs=30, 
+                              validation_data=validation_generator, 
+                              validation_steps=50)
 ```
 
     Epoch 1/30
@@ -203,11 +205,11 @@ plt.show()
 ```
 
 
-![png](index_files/index_9_0.png)
+![png](index_files/index_8_0.png)
 
 
 
-![png](index_files/index_9_1.png)
+![png](index_files/index_8_1.png)
 
 
 
@@ -231,7 +233,7 @@ model.save('chest_xray_downsampled_data.h5')
 
 Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. As such, if you haven't already, implement a data augmentation setup.
 
-**Warning: ⏰ This process took nearly 4 hours to run on a relatively new macbook pro. As such, it is recommended that you simply code the setup and compare to the solution branch, or set the process to run overnight if you do choose to actually run the code.**
+**Warning: ⏰ This process took nearly 4 hours to run on a relatively new macbook pro. As such, it is recommended that you simply code the setup and compare to the solution branch, or set the process to run overnight if you do choose to actually run the code.** 
 
 
 ```python
@@ -240,14 +242,13 @@ start = datetime.datetime.now()
 
 
 ```python
-train_datagen = ImageDataGenerator(
-      rotation_range=40,
-      width_shift_range=0.2,
-      height_shift_range=0.2,
-      shear_range=0.2,
-      zoom_range=0.2,
-      horizontal_flip=True,
-      fill_mode='nearest')
+train_datagen = ImageDataGenerator(rotation_range=40, 
+                                   width_shift_range=0.2, 
+                                   height_shift_range=0.2, 
+                                   shear_range=0.2, 
+                                   zoom_range=0.2, 
+                                   horizontal_flip=True, 
+                                   fill_mode='nearest')
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
@@ -260,18 +261,16 @@ train_generator = train_datagen.flow_from_directory(
         # Since we use binary_crossentropy loss, we need binary labels
         class_mode='binary')
 
-validation_generator = test_datagen.flow_from_directory(
-        validation_dir,
-        target_size=(150, 150),
-        batch_size=32,
-        class_mode='binary')
+validation_generator = test_datagen.flow_from_directory(validation_dir, 
+                                                        target_size=(150, 150), 
+                                                        batch_size=32, 
+                                                        class_mode='binary')
 
-history = model.fit_generator(
-      train_generator,
-      steps_per_epoch=100,
-      epochs=100,
-      validation_data=validation_generator,
-      validation_steps=50)
+history = model.fit_generator(train_generator, 
+                              steps_per_epoch=100, 
+                              epochs=100, 
+                              validation_data=validation_generator, 
+                              validation_steps=50)
 ```
 
     Found 1738 images belonging to 2 classes.
@@ -498,11 +497,11 @@ plt.show()
 ```
 
 
-![png](index_files/index_16_0.png)
+![png](index_files/index_15_0.png)
 
 
 
-![png](index_files/index_16_1.png)
+![png](index_files/index_15_1.png)
 
 
 
@@ -515,6 +514,8 @@ print('Training with data augmentation took a total of {}'.format(elapsed))
     Training with data augmentation took a total of 3:51:22.263853
 
 
+Save the model for future reference.  
+
 
 ```python
 model.save('chest_xray_downsampled_with_augmentation_data.h5')
@@ -522,15 +523,14 @@ model.save('chest_xray_downsampled_with_augmentation_data.h5')
 
 ## Final Evaluation
 
-Now use the test set to perform a final evaluation on your model of choice.
+Now use the test set to perform a final evaluation on your model of choice. 
 
 
 ```python
-test_generator = test_datagen.flow_from_directory(
-        test_dir,
-        target_size=(150, 150),
-        batch_size=20,
-        class_mode='binary')
+test_generator = test_datagen.flow_from_directory(test_dir, 
+                                                  target_size=(150, 150), 
+                                                  batch_size=20, 
+                                                  class_mode='binary')
 test_loss, test_acc = model.evaluate_generator(test_generator, steps=50)
 print('test acc:', test_acc)
 ```
@@ -539,17 +539,17 @@ print('test acc:', test_acc)
     test acc: 0.6271008439675099
 
 
-## Extension: Adding Data to the Model
+## Level Up (Optional): Adding More Data to the Model
 
 As discussed, the current dataset we worked with is a subset of a dataset hosted on Kaggle. Increasing the data that we use to train the model will result in additional performance gains but will also result in longer training times and be more resource intensive.   
 
 ⏰ It is estimated that training on the full dataset will take approximately 4 hours (and potentially significantly longer) depending on your computer's specifications.
 
-In order to test the impact of training on the full dataset, start by downloading the data from kaggle here: https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia.   
+In order to test the impact of training on the full dataset, start by downloading the data from Kaggle here: https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia.   
 
 
 ```python
-#Optional extension; Your code here
+# Optional extension; Your code here
 # Imports from above-provided as reference
 # from keras import optimizers
 # from keras import layers
@@ -558,6 +558,7 @@ In order to test the impact of training on the full dataset, start by downloadin
 # import datetime
 # import matplotlib.pyplot as plt
 # %matplotlib inline 
+# ⏰ This cell may take several hours to run 
 
 start = datetime.datetime.now()
 
@@ -565,7 +566,7 @@ train_dir = 'chest_xray/train'
 validation_dir = 'chest_xray/val/'
 test_dir = 'chest_xray/test/'
 
-#Basic Data Loading; All images will be rescaled by 1./255
+# Basic Data Loading; All images will be rescaled by 1./255
 # train_datagen = ImageDataGenerator(rescale=1./255)
 # test_datagen = ImageDataGenerator(rescale=1./255)
 
@@ -584,17 +585,16 @@ test_dir = 'chest_xray/test/'
 #         batch_size=20,
 #         class_mode='binary')
 
-#With Data Augmentation
-train_datagen = ImageDataGenerator(
-      rotation_range=40,
-      width_shift_range=0.2,
-      height_shift_range=0.2,
-      shear_range=0.2,
-      zoom_range=0.2,
-      horizontal_flip=True,
-      fill_mode='nearest')
+# With Data Augmentation
+train_datagen = ImageDataGenerator(rotation_range=40,
+                                   width_shift_range=0.2,
+                                   height_shift_range=0.2,
+                                   shear_range=0.2,
+                                   zoom_range=0.2,
+                                   horizontal_flip=True,
+                                   fill_mode='nearest')
 
-#Never apply data augmentation to test/validation sets 
+# Never apply data augmentation to test/validation sets 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
@@ -606,13 +606,12 @@ train_generator = train_datagen.flow_from_directory(
         # Since we use binary_crossentropy loss, we need binary labels
         class_mode='binary')
 
-validation_generator = test_datagen.flow_from_directory(
-        validation_dir,
-        target_size=(150, 150),
-        batch_size=32,
-        class_mode='binary')
+validation_generator = test_datagen.flow_from_directory(validation_dir,
+                                                        target_size=(150, 150),
+                                                        batch_size=32,
+                                                        class_mode='binary')
 
-#Design Model Architecture
+# Design Model Architecture
 model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu',
                         input_shape=(150, 150, 3)))
@@ -632,16 +631,14 @@ model.compile(loss='binary_crossentropy',
               optimizer=optimizers.RMSprop(lr=1e-4),
               metrics=['acc'])
 
-history = model.fit_generator(
-      train_generator,
-      steps_per_epoch=100,
-      epochs=100,
-      validation_data=validation_generator,
-      validation_steps=50)
+history = model.fit_generator(train_generator, 
+                              steps_per_epoch=100, 
+                              epochs=100, 
+                              validation_data=validation_generator, 
+                              validation_steps=50)
 
 
-#Viz
-
+# Viz
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 loss = history.history['loss']
@@ -885,11 +882,10 @@ print('Full data model training and evaluation took a total of:\n {}'.format(ela
 
 
 ```python
-test_generator = test_datagen.flow_from_directory(
-        test_dir,
-        target_size=(150, 150),
-        batch_size=20,
-        class_mode='binary')
+test_generator = test_datagen.flow_from_directory(test_dir, 
+                                                  target_size=(150, 150), 
+                                                  batch_size=20, 
+                                                  class_mode='binary')
 test_loss, test_acc = model.evaluate_generator(test_generator, steps=50)
 print('test acc:', test_acc)
 ```
