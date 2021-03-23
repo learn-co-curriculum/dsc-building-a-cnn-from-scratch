@@ -22,6 +22,16 @@ You can find the initial downsampled dataset in a subdirectory, **chest_xray**, 
 
 
 ```python
+# Load the images; be sure to also preprocess these into tensors 
+
+train_dir = 'chest_xray_downsampled/train'
+validation_dir = 'chest_xray_downsampled/val/'
+test_dir = 'chest_xray_downsampled/test/' 
+```
+
+
+```python
+# __SOLUTION__ 
 from keras.preprocessing.image import ImageDataGenerator
 import datetime
 
@@ -36,6 +46,7 @@ start = datetime.datetime.now()
 
 
 ```python
+# __SOLUTION__ 
 train_dir = 'chest_xray_downsampled/train'
 validation_dir = 'chest_xray_downsampled/val/'
 test_dir = 'chest_xray_downsampled/test/'
@@ -74,6 +85,12 @@ Now it's time to design your CNN using Keras! Remember a few things when doing t
 
 
 ```python
+# Your code here; design and compile the model
+```
+
+
+```python
+# __SOLUTION__ 
 from keras import layers
 from keras import models
 
@@ -94,6 +111,7 @@ model.add(layers.Dense(1, activation='sigmoid'))
 
 
 ```python
+# __SOLUTION__ 
 from keras import optimizers
 
 model.compile(loss='binary_crossentropy',
@@ -112,6 +130,22 @@ If you are concerned with runtime, you may want to set your model to run the tra
 
 
 ```python
+# Set the model to train 
+# ⏰ This cell may take several minutes to run 
+
+```
+
+
+```python
+# Plot history
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+```
+
+
+```python
+# __SOLUTION__ 
 # ⏰ This cell may take several minutes to run
 history = model.fit_generator(train_generator, 
                               steps_per_epoch=100, 
@@ -184,6 +218,7 @@ history = model.fit_generator(train_generator,
 
 
 ```python
+# __SOLUTION__ 
 import matplotlib.pyplot as plt
 %matplotlib inline 
 
@@ -205,15 +240,16 @@ plt.show()
 ```
 
 
-![png](index_files/index_8_0.png)
+![png](index_files/index_12_0.png)
 
 
 
-![png](index_files/index_8_1.png)
+![png](index_files/index_12_1.png)
 
 
 
 ```python
+# __SOLUTION__ 
 end = datetime.datetime.now()
 elapsed = end - start
 print('Training took a total of {}'.format(elapsed))
@@ -226,6 +262,12 @@ print('Training took a total of {}'.format(elapsed))
 
 
 ```python
+# Your code here; save the model for future reference 
+```
+
+
+```python
+# __SOLUTION__ 
 model.save('chest_xray_downsampled_data.h5')
 ```
 
@@ -237,11 +279,21 @@ Recall that data augmentation is typically always a necessary step when using a 
 
 
 ```python
+# Add data augmentation to the model setup and set the model to train; 
+# See warnings above if you intend to run this block of code 
+# ⏰ This cell may take several hours to run 
+
+```
+
+
+```python
+# __SOLUTION__ 
 start = datetime.datetime.now()
 ```
 
 
 ```python
+# __SOLUTION__ 
 train_datagen = ImageDataGenerator(rotation_range=40, 
                                    width_shift_range=0.2, 
                                    height_shift_range=0.2, 
@@ -479,6 +531,7 @@ history = model.fit_generator(train_generator,
 
 
 ```python
+# __SOLUTION__ 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 loss = history.history['loss']
@@ -497,15 +550,16 @@ plt.show()
 ```
 
 
-![png](index_files/index_15_0.png)
+![png](index_files/index_21_0.png)
 
 
 
-![png](index_files/index_15_1.png)
+![png](index_files/index_21_1.png)
 
 
 
 ```python
+# __SOLUTION__ 
 end = datetime.datetime.now()
 elapsed = end - start
 print('Training with data augmentation took a total of {}'.format(elapsed))
@@ -518,6 +572,13 @@ Save the model for future reference.
 
 
 ```python
+# Save the model 
+
+```
+
+
+```python
+# __SOLUTION__ 
 model.save('chest_xray_downsampled_with_augmentation_data.h5')
 ```
 
@@ -527,6 +588,13 @@ Now use the test set to perform a final evaluation on your model of choice.
 
 
 ```python
+# Your code here 
+# Perform a final evaluation using the test set
+```
+
+
+```python
+# __SOLUTION__ 
 test_generator = test_datagen.flow_from_directory(test_dir, 
                                                   target_size=(150, 150), 
                                                   batch_size=20, 
@@ -549,6 +617,13 @@ In order to test the impact of training on the full dataset, start by downloadin
 
 
 ```python
+# Optional extension; Your code here
+# ⏰ This cell may take several hours to run 
+```
+
+
+```python
+# __SOLUTION__ 
 # Optional extension; Your code here
 # Imports from above-provided as reference
 # from keras import optimizers
@@ -869,11 +944,11 @@ print('Full data model training and evaluation took a total of:\n {}'.format(ela
 
 
 
-![png](index_files/index_22_1.png)
+![png](index_files/index_31_1.png)
 
 
 
-![png](index_files/index_22_2.png)
+![png](index_files/index_31_2.png)
 
 
     Full data model training and evaluation took a total of:
@@ -882,6 +957,7 @@ print('Full data model training and evaluation took a total of:\n {}'.format(ela
 
 
 ```python
+# __SOLUTION__ 
 test_generator = test_datagen.flow_from_directory(test_dir, 
                                                   target_size=(150, 150), 
                                                   batch_size=20, 
@@ -896,6 +972,7 @@ print('test acc:', test_acc)
 
 
 ```python
+# __SOLUTION__ 
 end = datetime.datetime.now()
 elapsed = end - original_start
 print('Entire notebook took a total of:\n {}'.format(elapsed))
