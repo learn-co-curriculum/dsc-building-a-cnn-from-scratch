@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Now that you have background knowledge regarding how CNNs work and how to build them using Keras, its time to practice those skills a little more independently in order to build a CNN on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
+Now that you have background knowledge regarding how Convolution Neural Networks (CNNs) work and how to build them using Keras, its time to practice those skills a little more independently in order to build a CNN (or ConvNet) on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
 
 ## Objectives
 
@@ -21,16 +21,32 @@ You can find the initial downsampled dataset in a subdirectory, **cats_dogs_down
 
 
 ```python
-# Load the images; be sure to also preprocess these into tensors 
+# Load the images
 
 train_dir = 'cats_dogs_downsampled/train'
 validation_dir = 'cats_dogs_downsampled/val/'
 test_dir = 'cats_dogs_downsampled/test/' 
 ```
 
+
+```python
+# Set-up date time to track how long run time takes
+import datetime
+
+original_start = datetime.datetime.now()
+start = datetime.datetime.now()
+```
+
+
+```python
+# Preprocess the images into tensors
+# Rescale the data by 1/.255 and use binary_crossentropy loss
+
+```
+
 ## Designing the Model
 
-Now it's time to design your CNN using Keras! Remember a few things when doing this: 
+Now it's time to design your CNN using Keras. Remember a few things when doing this: 
 
 - You should alternate convolutional and pooling layers
 - You should have later layers have a larger number of parameters in order to detect more abstract patterns
@@ -39,13 +55,18 @@ Now it's time to design your CNN using Keras! Remember a few things when doing t
 
 
 ```python
-# Your code here; design and compile the model
+# Design the model
+# Note: You may get a comment from tf regarding your kernel. This is not a warning per se, but rather informational.
+```
+
+
+```python
+# Compile the model
 ```
 
 ## Training and Evaluating the Model
 
-Remember that training deep networks is resource intensive: depending on the size of the data, even a CNN with 3-4 successive convolutional and pooling layers is apt to take a hours to train on a high end laptop. Using 30 epochs and 8 layers (alternating between convolutional and pooling), our model took about 40 minutes to run on a year old macbook pro.
-
+Remember that training deep networks is resource intensive: depending on the size of the data, even a CNN with 3-4 successive convolutional and pooling layers is apt to take a hours to train on a high end laptop. See the code chunk below to see how long it took to run your model. 
 
 If you are concerned with runtime, you may want to set your model to run the training epochs overnight.  
 
@@ -54,6 +75,8 @@ If you are concerned with runtime, you may want to set your model to run the tra
 
 ```python
 # Set the model to train 
+# Note: You may get a comment from tf regarding your GPU or sometning similar.
+# This is not a warning per se, but rather informational.
 # ⏰ This cell may take several minutes to run 
 
 ```
@@ -64,26 +87,47 @@ If you are concerned with runtime, you may want to set your model to run the tra
 import matplotlib.pyplot as plt
 %matplotlib inline
 
+# Type code here for plot history
+```
+
+
+```python
+# Check runtime
+
+end = datetime.datetime.now()
+elapsed = end - start
+print('Training took a total of {}'.format(elapsed))
 ```
 
 ## Save the Model
 
 
 ```python
-# Your code here; save the model for future reference 
+# Save the model for future reference 
 ```
 
 ## Data Augmentation
 
-Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. As such, if you haven't already, implement a data augmentation setup.
+Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. If you haven't already, implement a data augmentation setup.
 
-**Warning: ⏰ This process took nearly 4 hours to run on a relatively new macbook pro. As such, it is recommended that you simply code the setup and compare to the solution branch, or set the process to run overnight if you do choose to actually run the code.** 
+**Warning: ⏰ This process may take awhile depending on your set-up. As such, make allowances for this as necessary.** 
+
+
+```python
+# Set-up date time to track how long run time takes
+start = datetime.datetime.now()
+```
 
 
 ```python
 # Add data augmentation to the model setup and set the model to train; 
-# See warnings above if you intend to run this block of code 
-# ⏰ This cell may take several hours to run 
+# See the warnings above if you intend to run these blocks of code 
+# ⏰ These cells where may take quite some time to run
+```
+
+
+```python
+# Check runtime 
 
 ```
 
@@ -101,10 +145,9 @@ Now use the test set to perform a final evaluation on your model of choice.
 
 
 ```python
-# Your code here 
 # Perform a final evaluation using the test set
 ```
 
 ## Summary
 
-Well done! In this lab, you practice building your own CNN for image recognition which drastically outperformed our previous attempts using a standard deep learning model alone. In the upcoming sections, we'll continue to investigate further techniques associated with CNNs including visualizing the representations they learn and techniques to further bolster their performance when we have limited training data such as here.
+Well done. In this lab, you practice building your own CNN for image recognition which drastically outperformed our previous attempts using a standard deep learning model alone. In the upcoming sections, we'll continue to investigate further techniques associated with CNNs including visualizing the representations they learn and techniques to further bolster their performance when we have limited training data such as here.
