@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Now that you have background knowledge regarding how CNNs work and how to build them using Keras, its time to practice those skills a little more independently in order to build a CNN on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
+Now that you have background knowledge regarding how Convolution Neural Networks (CNNs) work and how to build them using Keras, its time to practice those skills a little more independently in order to build a CNN (or ConvNet) on your own to solve a image recognition problem. In this lab, you'll practice building an image classifier from start to finish using a CNN.  
 
 ## Objectives
 
@@ -21,7 +21,16 @@ You can find the initial downsampled dataset in a subdirectory, **cats_dogs_down
 
 
 ```python
-from keras.preprocessing.image import ImageDataGenerator
+# Load the images
+
+train_dir = 'cats_dogs_downsampled/train'
+validation_dir = 'cats_dogs_downsampled/val/'
+test_dir = 'cats_dogs_downsampled/test/' 
+```
+
+
+```python
+
 import datetime
 
 original_start = datetime.datetime.now()
@@ -30,6 +39,11 @@ start = datetime.datetime.now()
 
 
 ```python
+# Preprocess the images into tensors
+# Rescale the data by 1/.255 and use binary_crossentropy loss
+
+from keras.preprocessing.image import ImageDataGenerator
+
 # All images will be rescaled by 1./255
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
@@ -55,7 +69,7 @@ validation_generator = val_datagen.flow_from_directory(validation_dir,
 
 ## Designing the Model
 
-Now it's time to design your CNN using Keras! Remember a few things when doing this: 
+Now it's time to design your CNN using Keras. Remember a few things when doing this: 
 
 - You should alternate convolutional and pooling layers
 - You should have later layers have a larger number of parameters in order to detect more abstract patterns
@@ -64,6 +78,9 @@ Now it's time to design your CNN using Keras! Remember a few things when doing t
 
 
 ```python
+# Design the model
+# Note: You may get a comment from tf regarding your kernel. This is not a warning per se, but rather informational.
+
 from keras import layers
 from keras import models
 
@@ -82,19 +99,26 @@ model.add(layers.Dense(512, activation='relu'))
 model.add(layers.Dense(1, activation='sigmoid'))
 ```
 
+    Metal device set to: Apple M1 Pro
+
+
+    2023-06-14 10:04:42.982381: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+    2023-06-14 10:04:42.982809: I tensorflow/core/common_runtime/pluggable_device/pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+
+
 
 ```python
+# Compile the model
 from keras import optimizers
 
 model.compile(loss='binary_crossentropy',
-              optimizer=optimizers.RMSprop(lr=1e-4),
+              optimizer=optimizers.RMSprop(learning_rate=1e-4),
               metrics=['acc'])
 ```
 
 ## Training and Evaluating the Model
 
-Remember that training deep networks is resource intensive: depending on the size of the data, even a CNN with 3-4 successive convolutional and pooling layers is apt to take a hours to train on a high end laptop. Using 30 epochs and 8 layers (alternating between convolutional and pooling), our model took about 40 minutes to run on a year old macbook pro.
-
+Remember that training deep networks is resource intensive: depending on the size of the data, even a CNN with 3-4 successive convolutional and pooling layers is apt to take a hours to train on a high end laptop. See the code chunk below to see how long it took to run your model. 
 
 If you are concerned with runtime, you may want to set your model to run the training epochs overnight.  
 
@@ -102,6 +126,9 @@ If you are concerned with runtime, you may want to set your model to run the tra
 
 
 ```python
+# Set the model to train 
+# Note: You may get a comment from tf regarding your GPU or sometning similar.
+# This is not a warning per se, but rather informational.
 # ⏰ This cell may take several minutes to run
 history = model.fit(train_generator, 
                               steps_per_epoch=100, 
@@ -111,69 +138,82 @@ history = model.fit(train_generator,
 ```
 
     Epoch 1/30
-    100/100 [==============================] - 33s 332ms/step - loss: 0.6887 - acc: 0.5320 - val_loss: 0.6971 - val_acc: 0.5075
+
+
+    2023-06-14 10:04:52.056247: W tensorflow/core/platform/profile_utils/cpu_utils.cc:128] Failed to get CPU frequency: 0 Hz
+    2023-06-14 10:04:52.275945: I tensorflow/core/grappler/optimizers/custom_graph_optimizer_registry.cc:113] Plugin optimizer for device_type GPU is enabled.
+
+
+    100/100 [==============================] - ETA: 0s - loss: 0.6897 - acc: 0.5375
+
+    2023-06-14 10:04:55.448925: I tensorflow/core/grappler/optimizers/custom_graph_optimizer_registry.cc:113] Plugin optimizer for device_type GPU is enabled.
+
+
+    100/100 [==============================] - 4s 32ms/step - loss: 0.6897 - acc: 0.5375 - val_loss: 0.6812 - val_acc: 0.5075
     Epoch 2/30
-    100/100 [==============================] - 32s 324ms/step - loss: 0.6566 - acc: 0.6095 - val_loss: 0.6364 - val_acc: 0.6250
+    100/100 [==============================] - 3s 29ms/step - loss: 0.6567 - acc: 0.6040 - val_loss: 0.6506 - val_acc: 0.5625
     Epoch 3/30
-    100/100 [==============================] - 32s 324ms/step - loss: 0.6047 - acc: 0.6775 - val_loss: 0.7532 - val_acc: 0.5375
+    100/100 [==============================] - 3s 29ms/step - loss: 0.6055 - acc: 0.6775 - val_loss: 0.6607 - val_acc: 0.6000
     Epoch 4/30
-    100/100 [==============================] - 34s 338ms/step - loss: 0.5710 - acc: 0.7010 - val_loss: 0.5709 - val_acc: 0.6750
+    100/100 [==============================] - 3s 29ms/step - loss: 0.5660 - acc: 0.7015 - val_loss: 0.5900 - val_acc: 0.6825
     Epoch 5/30
-    100/100 [==============================] - 36s 363ms/step - loss: 0.5288 - acc: 0.7350 - val_loss: 0.5640 - val_acc: 0.7000
+    100/100 [==============================] - 3s 29ms/step - loss: 0.5402 - acc: 0.7320 - val_loss: 0.5672 - val_acc: 0.7175
     Epoch 6/30
-    100/100 [==============================] - 34s 344ms/step - loss: 0.5057 - acc: 0.7395 - val_loss: 0.5231 - val_acc: 0.7375
+    100/100 [==============================] - 3s 29ms/step - loss: 0.5145 - acc: 0.7365 - val_loss: 0.5419 - val_acc: 0.7100
     Epoch 7/30
-    100/100 [==============================] - 37s 369ms/step - loss: 0.4792 - acc: 0.7690 - val_loss: 0.5064 - val_acc: 0.7475
+    100/100 [==============================] - 3s 29ms/step - loss: 0.4923 - acc: 0.7645 - val_loss: 0.5527 - val_acc: 0.7100
     Epoch 8/30
-    100/100 [==============================] - 33s 334ms/step - loss: 0.4535 - acc: 0.7785 - val_loss: 0.5260 - val_acc: 0.7225
+    100/100 [==============================] - 3s 29ms/step - loss: 0.4612 - acc: 0.7805 - val_loss: 0.5086 - val_acc: 0.7525
     Epoch 9/30
-    100/100 [==============================] - 32s 324ms/step - loss: 0.4354 - acc: 0.8060 - val_loss: 0.4936 - val_acc: 0.7650
+    100/100 [==============================] - 3s 29ms/step - loss: 0.4393 - acc: 0.7885 - val_loss: 0.5498 - val_acc: 0.7225
     Epoch 10/30
-    100/100 [==============================] - 31s 312ms/step - loss: 0.4035 - acc: 0.8160 - val_loss: 0.4834 - val_acc: 0.7525
+    100/100 [==============================] - 3s 29ms/step - loss: 0.4156 - acc: 0.8080 - val_loss: 0.5176 - val_acc: 0.7425
     Epoch 11/30
-    100/100 [==============================] - 34s 336ms/step - loss: 0.3806 - acc: 0.8275 - val_loss: 0.5114 - val_acc: 0.7225
+    100/100 [==============================] - 3s 29ms/step - loss: 0.3895 - acc: 0.8270 - val_loss: 0.4893 - val_acc: 0.7575
     Epoch 12/30
-    100/100 [==============================] - 32s 320ms/step - loss: 0.3578 - acc: 0.8350 - val_loss: 0.4935 - val_acc: 0.7475
+    100/100 [==============================] - 3s 29ms/step - loss: 0.3696 - acc: 0.8370 - val_loss: 0.5213 - val_acc: 0.7550
     Epoch 13/30
-    100/100 [==============================] - 33s 332ms/step - loss: 0.3310 - acc: 0.8595 - val_loss: 0.5039 - val_acc: 0.7475
+    100/100 [==============================] - 3s 29ms/step - loss: 0.3458 - acc: 0.8465 - val_loss: 0.5115 - val_acc: 0.7475
     Epoch 14/30
-    100/100 [==============================] - 33s 327ms/step - loss: 0.3085 - acc: 0.8730 - val_loss: 0.5270 - val_acc: 0.7575
+    100/100 [==============================] - 3s 29ms/step - loss: 0.3270 - acc: 0.8545 - val_loss: 0.5011 - val_acc: 0.7700
     Epoch 15/30
-    100/100 [==============================] - 34s 338ms/step - loss: 0.2869 - acc: 0.8685 - val_loss: 0.5364 - val_acc: 0.7500
+    100/100 [==============================] - 3s 29ms/step - loss: 0.3005 - acc: 0.8740 - val_loss: 0.4847 - val_acc: 0.7650
     Epoch 16/30
-    100/100 [==============================] - 34s 343ms/step - loss: 0.2716 - acc: 0.8870 - val_loss: 0.5125 - val_acc: 0.7500
+    100/100 [==============================] - 3s 29ms/step - loss: 0.2812 - acc: 0.8855 - val_loss: 0.4956 - val_acc: 0.7475
     Epoch 17/30
-    100/100 [==============================] - 33s 327ms/step - loss: 0.2382 - acc: 0.9020 - val_loss: 0.5793 - val_acc: 0.7625
+    100/100 [==============================] - 3s 29ms/step - loss: 0.2527 - acc: 0.8890 - val_loss: 0.4930 - val_acc: 0.7750
     Epoch 18/30
-    100/100 [==============================] - 32s 324ms/step - loss: 0.2308 - acc: 0.9105 - val_loss: 0.5709 - val_acc: 0.7575
+    100/100 [==============================] - 3s 29ms/step - loss: 0.2327 - acc: 0.9145 - val_loss: 0.5025 - val_acc: 0.7750
     Epoch 19/30
-    100/100 [==============================] - 32s 321ms/step - loss: 0.2039 - acc: 0.9270 - val_loss: 0.5350 - val_acc: 0.7525
+    100/100 [==============================] - 3s 29ms/step - loss: 0.2102 - acc: 0.9235 - val_loss: 0.5303 - val_acc: 0.7725
     Epoch 20/30
-    100/100 [==============================] - 32s 323ms/step - loss: 0.1880 - acc: 0.9345 - val_loss: 0.5994 - val_acc: 0.7450
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1927 - acc: 0.9315 - val_loss: 0.5390 - val_acc: 0.7675
     Epoch 21/30
-    100/100 [==============================] - 32s 318ms/step - loss: 0.1656 - acc: 0.9365 - val_loss: 0.6693 - val_acc: 0.7300
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1705 - acc: 0.9360 - val_loss: 0.5840 - val_acc: 0.7550
     Epoch 22/30
-    100/100 [==============================] - 32s 321ms/step - loss: 0.1419 - acc: 0.9515 - val_loss: 0.6539 - val_acc: 0.7475
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1625 - acc: 0.9445 - val_loss: 0.5890 - val_acc: 0.7800
     Epoch 23/30
-    100/100 [==============================] - 31s 311ms/step - loss: 0.1290 - acc: 0.9545 - val_loss: 0.6515 - val_acc: 0.7375
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1377 - acc: 0.9535 - val_loss: 0.5965 - val_acc: 0.7600
     Epoch 24/30
-    100/100 [==============================] - 33s 328ms/step - loss: 0.1211 - acc: 0.9590 - val_loss: 0.6170 - val_acc: 0.7700
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1224 - acc: 0.9565 - val_loss: 0.6173 - val_acc: 0.7625
     Epoch 25/30
-    100/100 [==============================] - 32s 316ms/step - loss: 0.1001 - acc: 0.9690 - val_loss: 0.7030 - val_acc: 0.7300
+    100/100 [==============================] - 3s 29ms/step - loss: 0.1095 - acc: 0.9605 - val_loss: 0.6362 - val_acc: 0.7750
     Epoch 26/30
-    100/100 [==============================] - 31s 315ms/step - loss: 0.0864 - acc: 0.9765 - val_loss: 0.7112 - val_acc: 0.7575
+    100/100 [==============================] - 3s 29ms/step - loss: 0.0933 - acc: 0.9710 - val_loss: 0.6589 - val_acc: 0.7700
     Epoch 27/30
-    100/100 [==============================] - 32s 317ms/step - loss: 0.0729 - acc: 0.9795 - val_loss: 0.8144 - val_acc: 0.7375
+    100/100 [==============================] - 3s 29ms/step - loss: 0.0755 - acc: 0.9810 - val_loss: 0.6991 - val_acc: 0.7650
     Epoch 28/30
-    100/100 [==============================] - 32s 317ms/step - loss: 0.0705 - acc: 0.9755 - val_loss: 0.7445 - val_acc: 0.7500
+    100/100 [==============================] - 3s 29ms/step - loss: 0.0689 - acc: 0.9825 - val_loss: 0.7184 - val_acc: 0.7725
     Epoch 29/30
-    100/100 [==============================] - 32s 315ms/step - loss: 0.0592 - acc: 0.9830 - val_loss: 0.7779 - val_acc: 0.7525
+    100/100 [==============================] - 3s 29ms/step - loss: 0.0607 - acc: 0.9800 - val_loss: 0.7673 - val_acc: 0.7600
     Epoch 30/30
-    100/100 [==============================] - 32s 316ms/step - loss: 0.0415 - acc: 0.9890 - val_loss: 1.0948 - val_acc: 0.7350
+    100/100 [==============================] - 3s 29ms/step - loss: 0.0511 - acc: 0.9875 - val_loss: 0.9144 - val_acc: 0.7500
 
 
 
 ```python
+# Plot history
+
 import matplotlib.pyplot as plt
 %matplotlib inline 
 
@@ -195,43 +235,53 @@ plt.show()
 ```
 
 
-![png](index_files/index_8_0.png)
+    
+![png](index_files/index_9_0.png)
+    
 
 
 
-![png](index_files/index_8_1.png)
+    
+![png](index_files/index_9_1.png)
+    
 
 
 
 ```python
+# Check runtime
+
 end = datetime.datetime.now()
 elapsed = end - start
 print('Training took a total of {}'.format(elapsed))
 ```
 
-    Training took a total of 0:16:35.989245
+    Training took a total of 0:02:57.288249
 
 
 ## Save the Model
 
 
 ```python
+# Save the model for future reference 
+
 model.save('cats_dogs_downsampled_data.h5')
 ```
 
 ## Data Augmentation
 
-Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. As such, if you haven't already, implement a data augmentation setup.
+Recall that data augmentation is typically always a necessary step when using a small dataset as this one which you have been provided. If you haven't already, implement a data augmentation setup.
 
-**Warning: ⏰ This process took nearly 4 hours to run on a relatively new macbook pro. As such, it is recommended that you simply code the setup and compare to the solution branch, or set the process to run overnight if you do choose to actually run the code.** 
+**Warning: ⏰ This process may take awhile depending on your set-up. As such, make allowances for this as necessary.** 
 
 
 ```python
+# Set-up date time to track how long run time takes
 start = datetime.datetime.now()
 ```
 
 
 ```python
+
 train_datagen = ImageDataGenerator(rescale=1./255,
                                    rotation_range=40, 
                                    width_shift_range=0.2, 
@@ -259,69 +309,70 @@ history = model.fit(train_generator,
 
     Found 2140 images belonging to 2 classes.
     Epoch 1/30
-    100/100 [==============================] - 33s 334ms/step - loss: 0.7139 - acc: 0.6745 - val_loss: 0.5301 - val_acc: 0.7375
+    100/100 [==============================] - 6s 57ms/step - loss: 0.7259 - acc: 0.6745 - val_loss: 0.5039 - val_acc: 0.7600
     Epoch 2/30
-    100/100 [==============================] - 32s 322ms/step - loss: 0.5696 - acc: 0.7020 - val_loss: 0.5035 - val_acc: 0.7450
+    100/100 [==============================] - 6s 56ms/step - loss: 0.5889 - acc: 0.6785 - val_loss: 0.4906 - val_acc: 0.7750
     Epoch 3/30
-    100/100 [==============================] - 33s 327ms/step - loss: 0.5776 - acc: 0.6985 - val_loss: 0.4911 - val_acc: 0.7600
+    100/100 [==============================] - 6s 57ms/step - loss: 0.5594 - acc: 0.7155 - val_loss: 0.4567 - val_acc: 0.7650
     Epoch 4/30
-    100/100 [==============================] - 34s 338ms/step - loss: 0.5562 - acc: 0.7090 - val_loss: 0.5226 - val_acc: 0.7475
+    100/100 [==============================] - 6s 57ms/step - loss: 0.5646 - acc: 0.7005 - val_loss: 0.4761 - val_acc: 0.7550
     Epoch 5/30
-    100/100 [==============================] - 33s 326ms/step - loss: 0.5603 - acc: 0.7165 - val_loss: 0.4552 - val_acc: 0.7850
+    100/100 [==============================] - 6s 57ms/step - loss: 0.5464 - acc: 0.7155 - val_loss: 0.4420 - val_acc: 0.7850
     Epoch 6/30
-    100/100 [==============================] - 32s 325ms/step - loss: 0.5361 - acc: 0.7210 - val_loss: 0.4576 - val_acc: 0.7850
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5497 - acc: 0.7235 - val_loss: 0.4245 - val_acc: 0.8075
     Epoch 7/30
-    100/100 [==============================] - 33s 326ms/step - loss: 0.5393 - acc: 0.7345 - val_loss: 0.4628 - val_acc: 0.7775
+    100/100 [==============================] - 6s 57ms/step - loss: 0.5395 - acc: 0.7175 - val_loss: 0.5365 - val_acc: 0.7050
     Epoch 8/30
-    100/100 [==============================] - 34s 338ms/step - loss: 0.5208 - acc: 0.7185 - val_loss: 0.4469 - val_acc: 0.7750
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5218 - acc: 0.7345 - val_loss: 0.4378 - val_acc: 0.7875
     Epoch 9/30
-    100/100 [==============================] - 35s 349ms/step - loss: 0.5210 - acc: 0.7340 - val_loss: 0.4302 - val_acc: 0.8075
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5258 - acc: 0.7345 - val_loss: 0.4556 - val_acc: 0.7800
     Epoch 10/30
-    100/100 [==============================] - 35s 350ms/step - loss: 0.5347 - acc: 0.7145 - val_loss: 0.4805 - val_acc: 0.7350
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5014 - acc: 0.7485 - val_loss: 0.4317 - val_acc: 0.7775
     Epoch 11/30
-    100/100 [==============================] - 34s 345ms/step - loss: 0.5258 - acc: 0.7290 - val_loss: 0.4464 - val_acc: 0.7900
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5169 - acc: 0.7310 - val_loss: 0.4260 - val_acc: 0.8100
     Epoch 12/30
-    100/100 [==============================] - 36s 359ms/step - loss: 0.5149 - acc: 0.7395 - val_loss: 0.4196 - val_acc: 0.8075
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5159 - acc: 0.7360 - val_loss: 0.4324 - val_acc: 0.8000
     Epoch 13/30
-    100/100 [==============================] - 36s 356ms/step - loss: 0.5013 - acc: 0.7475 - val_loss: 0.4617 - val_acc: 0.7825
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5187 - acc: 0.7410 - val_loss: 0.4231 - val_acc: 0.8075
     Epoch 14/30
-    100/100 [==============================] - 34s 343ms/step - loss: 0.5133 - acc: 0.7385 - val_loss: 0.4617 - val_acc: 0.7775
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5150 - acc: 0.7385 - val_loss: 0.4236 - val_acc: 0.8125
     Epoch 15/30
-    100/100 [==============================] - 34s 337ms/step - loss: 0.5107 - acc: 0.7435 - val_loss: 0.4241 - val_acc: 0.7975
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4995 - acc: 0.7525 - val_loss: 0.4303 - val_acc: 0.8050
     Epoch 16/30
-    100/100 [==============================] - 38s 377ms/step - loss: 0.5037 - acc: 0.7540 - val_loss: 0.4433 - val_acc: 0.7700
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4967 - acc: 0.7575 - val_loss: 0.4075 - val_acc: 0.8100
     Epoch 17/30
-    100/100 [==============================] - 35s 353ms/step - loss: 0.4900 - acc: 0.7555 - val_loss: 0.4220 - val_acc: 0.7875
+    100/100 [==============================] - 6s 58ms/step - loss: 0.5067 - acc: 0.7490 - val_loss: 0.4333 - val_acc: 0.8125
     Epoch 18/30
-    100/100 [==============================] - 38s 376ms/step - loss: 0.5009 - acc: 0.7495 - val_loss: 0.4761 - val_acc: 0.7650
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4930 - acc: 0.7585 - val_loss: 0.4701 - val_acc: 0.7750
     Epoch 19/30
-    100/100 [==============================] - 34s 340ms/step - loss: 0.4804 - acc: 0.7665 - val_loss: 0.3949 - val_acc: 0.8175
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4940 - acc: 0.7415 - val_loss: 0.4031 - val_acc: 0.8200
     Epoch 20/30
-    100/100 [==============================] - 34s 339ms/step - loss: 0.4808 - acc: 0.7640 - val_loss: 0.4370 - val_acc: 0.8025
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4871 - acc: 0.7660 - val_loss: 0.4960 - val_acc: 0.7600
     Epoch 21/30
-    100/100 [==============================] - 37s 370ms/step - loss: 0.4801 - acc: 0.7800 - val_loss: 0.4220 - val_acc: 0.8225
+    100/100 [==============================] - 6s 59ms/step - loss: 0.4747 - acc: 0.7720 - val_loss: 0.4089 - val_acc: 0.8300
     Epoch 22/30
-    100/100 [==============================] - 35s 346ms/step - loss: 0.4751 - acc: 0.7720 - val_loss: 0.3822 - val_acc: 0.8175
+    100/100 [==============================] - 6s 59ms/step - loss: 0.4858 - acc: 0.7570 - val_loss: 0.3874 - val_acc: 0.8150
     Epoch 23/30
-    100/100 [==============================] - 35s 355ms/step - loss: 0.4788 - acc: 0.7735 - val_loss: 0.3851 - val_acc: 0.8100
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4839 - acc: 0.7710 - val_loss: 0.4211 - val_acc: 0.8175
     Epoch 24/30
-    100/100 [==============================] - 34s 343ms/step - loss: 0.4656 - acc: 0.7745 - val_loss: 0.4068 - val_acc: 0.8125
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4683 - acc: 0.7640 - val_loss: 0.4130 - val_acc: 0.8125
     Epoch 25/30
-    100/100 [==============================] - 34s 335ms/step - loss: 0.4701 - acc: 0.7840 - val_loss: 0.3989 - val_acc: 0.8200
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4865 - acc: 0.7515 - val_loss: 0.4076 - val_acc: 0.8225
     Epoch 26/30
-    100/100 [==============================] - 34s 338ms/step - loss: 0.4609 - acc: 0.7800 - val_loss: 0.3969 - val_acc: 0.8175
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4616 - acc: 0.7755 - val_loss: 0.4057 - val_acc: 0.8275
     Epoch 27/30
-    100/100 [==============================] - 34s 345ms/step - loss: 0.4613 - acc: 0.7815 - val_loss: 0.3838 - val_acc: 0.8350
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4615 - acc: 0.7790 - val_loss: 0.4173 - val_acc: 0.7900
     Epoch 28/30
-    100/100 [==============================] - 34s 337ms/step - loss: 0.4617 - acc: 0.7740 - val_loss: 0.3814 - val_acc: 0.8325
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4662 - acc: 0.7785 - val_loss: 0.4043 - val_acc: 0.8125
     Epoch 29/30
-    100/100 [==============================] - 33s 333ms/step - loss: 0.4559 - acc: 0.7855 - val_loss: 0.3657 - val_acc: 0.8200
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4768 - acc: 0.7715 - val_loss: 0.4186 - val_acc: 0.7975
     Epoch 30/30
-    100/100 [==============================] - 33s 334ms/step - loss: 0.4532 - acc: 0.7870 - val_loss: 0.3656 - val_acc: 0.8500
+    100/100 [==============================] - 6s 58ms/step - loss: 0.4573 - acc: 0.7850 - val_loss: 0.4359 - val_acc: 0.7725
 
 
 
 ```python
+
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 loss = history.history['loss']
@@ -340,27 +391,33 @@ plt.show()
 ```
 
 
-![png](index_files/index_15_0.png)
+    
+![png](index_files/index_16_0.png)
+    
 
 
 
-![png](index_files/index_15_1.png)
+    
+![png](index_files/index_16_1.png)
+    
 
 
 
 ```python
+# Check runtime
 end = datetime.datetime.now()
 elapsed = end - start
 print('Training with data augmentation took a total of {}'.format(elapsed))
 ```
 
-    Training with data augmentation took a total of 0:17:24.572420
+    Training with data augmentation took a total of 0:03:43.083708
 
 
 Save the model for future reference.  
 
 
 ```python
+# Save the model 
 model.save('cats_dogs_downsampled_with_augmentation_data.h5')
 ```
 
@@ -370,6 +427,8 @@ Now use the test set to perform a final evaluation on your model of choice.
 
 
 ```python
+# Perform a final evaluation using the test set
+
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 test_generator = test_datagen.flow_from_directory(test_dir, 
@@ -381,10 +440,10 @@ print('test acc:', test_acc)
 ```
 
     Found 425 images belonging to 2 classes.
-    20/20 [==============================] - 2s 86ms/step - loss: 0.4640 - acc: 0.7650
-    test acc: 0.7649999856948853
+    20/20 [==============================] - 0s 17ms/step - loss: 0.4889 - acc: 0.7600
+    test acc: 0.7599999904632568
 
 
 ## Summary
 
-Well done! In this lab, you practice building your own CNN for image recognition which drastically outperformed our previous attempts using a standard deep learning model alone. In the upcoming sections, we'll continue to investigate further techniques associated with CNNs including visualizing the representations they learn and techniques to further bolster their performance when we have limited training data such as here.
+Well done. In this lab, you practice building your own CNN for image recognition which drastically outperformed our previous attempts using a standard deep learning model alone. In the upcoming sections, we'll continue to investigate further techniques associated with CNNs including visualizing the representations they learn and techniques to further bolster their performance when we have limited training data such as here.
